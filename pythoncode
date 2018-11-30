@@ -1,0 +1,63 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Nov 22 18:35:22 2018
+
+@author: Administrator
+"""
+import numpy as np
+import csv
+import math
+import matplotlib.pyplot as plt
+def loaddate():
+    data=[]
+    label=[]
+    fr=open('test.txt')
+    for each_line in fr:
+        each_line=each_line.strip().split()
+        data.append([float(each_line[0]),float(each_line[1]),float(each_line[2])])
+        label.append(int(each_line[3]))
+    return data,label
+def sigmoid(x):
+    a=[]
+    m,n=np.shape(x)
+    for i in range(m):
+        a.append(1.0/(1+math.exp(-x[i,0])))
+    a=np.mat(a)  
+    return a
+def train(data,label):
+    data=np.mat(data)
+    label=np.mat(label).transpose()
+    m,n=np.shape(data)
+    maxCycles=500;
+    weights=np.ones((n,1))
+    alpha=0.01
+    for i in range(maxCycles):
+        h=sigmoid(data*weights)
+        h=h.transpose()
+        error=(label-h)
+        weights=weights+alpha*data.transpose()*error
+    return weights
+data,label=loaddate()
+weight=train(data,label)
+
+m,n=np.shape(data)
+x1=[] 
+x2=[]
+y1=[] 
+y2=[]
+for i in range(m):
+    if label[i]==1:
+        x1.append(data[i][1])
+        y1.append(data[i][2])
+    else:
+        x2.append(data[i][1])
+        y2.append(data[i][2])
+fig=plt.figure()
+ax=fig.add_subplot(111)
+ax.scatter(x1,y1,c='red')
+ax.scatter(x2,y2,c='green') 
+x=np.linspace(-2.0,2.0,10)
+y=(-weight[0,0]-weight[1,0]*x)/weight[2,0]    
+ax.plot(x,y) 
+
+    
